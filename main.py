@@ -17,7 +17,7 @@ pygame.display.set_caption("NeonNitro")
 clock = pygame.time.Clock()
 menu = pygame.transform.scale(pygame.image.load('date/menu_screen.png'), (1920, 1080))
 game = pygame.Surface((1920, 1080))
-settings = pygame.Surface((1920, 1080))
+settings = pygame.transform.scale(pygame.image.load('date/settings_screen.png'), (1920, 1080))
 pygame.draw.rect(game, "red", (100, 100, 400, 400))
 now_screen = menu
 
@@ -35,6 +35,13 @@ while running:
                     running = False
                 if 1340 < event.pos[0] < 1520 and 190 < event.pos[1] < 370 and event.button == 1:
                     now_screen = settings
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+        else:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    now_screen = menu
     screen.fill((0, 0, 0))
     screen.blit(now_screen, (0, 0))
     pygame.display.flip()
