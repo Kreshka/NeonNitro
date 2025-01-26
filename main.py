@@ -10,6 +10,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
+
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((0, 0), 1)
@@ -18,9 +19,25 @@ clock = pygame.time.Clock()
 menu = pygame.transform.scale(pygame.image.load('date/menu_screen.png'), (1920, 1080))
 game = pygame.Surface((1920, 1080))
 settings = pygame.transform.scale(pygame.image.load('date/settings_screen.png'), (1920, 1080))
-pygame.draw.rect(game, "red", (100, 100, 400, 400))
 now_screen = menu
+all_sprites = pygame.sprite.Group()
 
+
+class Car(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(all_sprites)
+
+
+class Field(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(all_sprites)
+        self.image = pygame.transform.scale(pygame.image.load('date/field.png'), (1920, 1080))
+        self.rect = self.image.get_rect()
+        self.rect.x = 0
+        self.rect.y = 0
+
+
+field = Field()
 running = True
 while running:
     clock.tick(FPS)
@@ -42,7 +59,9 @@ while running:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     now_screen = menu
+        all_sprites.update(event)
     screen.fill((0, 0, 0))
+    all_sprites.draw(game)
     screen.blit(now_screen, (0, 0))
     pygame.display.flip()
 
