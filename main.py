@@ -26,6 +26,10 @@ all_sprites = pygame.sprite.Group()
 class Car(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(all_sprites)
+        self.image = pygame.transform.scale(pygame.image.load('date/main_car.png'), (190, 350))
+        self.rect = self.image.get_rect()
+        self.rect.x = 500
+        self.rect.y = 700
 
 
 class Field(pygame.sprite.Sprite):
@@ -36,8 +40,15 @@ class Field(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.y = 0
 
+    def update(self, *args, **kwargs):
+        self.rect.y += 10
+        print(self.rect.y)
+        if self.rect.y >= 1920:
+            self.rect.y = 0
+
 
 field = Field()
+car = Car()
 running = True
 while running:
     clock.tick(FPS)
@@ -59,9 +70,9 @@ while running:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     now_screen = menu
-        all_sprites.update(event)
     screen.fill((0, 0, 0))
     all_sprites.draw(game)
+    all_sprites.update()
     screen.blit(now_screen, (0, 0))
     pygame.display.flip()
 
