@@ -10,15 +10,16 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
+W, H = 1920, 1080
 
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((0, 0), 1)
 pygame.display.set_caption("NeonNitro")
 clock = pygame.time.Clock()
-menu = pygame.transform.scale(pygame.image.load('date/menu_screen.png'), (1920, 1080))
-game = pygame.Surface((1920, 1080))
-settings = pygame.transform.scale(pygame.image.load('date/settings_screen.png'), (1920, 1080))
+menu = pygame.transform.scale(pygame.image.load('date/menu_screen.png'), (W, H))
+game = pygame.Surface((W, H))
+settings = pygame.transform.scale(pygame.image.load('date/settings_screen.png'), (W, H))
 now_screen = menu
 all_sprites = pygame.sprite.Group()
 
@@ -26,32 +27,36 @@ all_sprites = pygame.sprite.Group()
 class Car(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(all_sprites)
-        self.image = pygame.transform.scale(pygame.image.load('date/main_car.png'), (190, 350))
+        self.image = pygame.transform.scale(pygame.image.load('date/main_car.png'), (133, 245))
         self.rect = self.image.get_rect()
         self.rect.x = 500
         self.rect.y = 700
 
 
 class Field(pygame.sprite.Sprite):
-    def __init__(self):
+    image = pygame.transform.scale(pygame.image.load('date/field.png'), (W, H))
+
+    def __init__(self, p):
         super().__init__(all_sprites)
-        self.image = pygame.transform.scale(pygame.image.load('date/field.png'), (1920, 1080))
+        self.image = Field.image
         self.rect = self.image.get_rect()
         self.rect.x = 0
-        self.rect.y = 0
+        if p:
+            self.rect.y = 0
+        else:
+            self.rect.y = -1080
 
     def update(self, *args, **kwargs):
         self.rect.y += 10
-        print(self.rect.y)
-        if self.rect.y >= 1920:
-            self.rect.y = 0
+        if self.rect.y >= 1080:
+            self.rect.y = -1080
 
 
-field = Field()
+field = Field(1)
+field2 = Field(0)
 car = Car()
 running = True
 while running:
-    clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -71,9 +76,11 @@ while running:
                 if event.key == pygame.K_ESCAPE:
                     now_screen = menu
     screen.fill((0, 0, 0))
-    all_sprites.draw(game)
+    game.fill((0, 0, 0))
     all_sprites.update()
+    all_sprites.draw(game)
     screen.blit(now_screen, (0, 0))
     pygame.display.flip()
+    clock.tick(FPS)
 
 pygame.quit()
