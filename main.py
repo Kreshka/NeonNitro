@@ -22,6 +22,7 @@ settings = pygame.transform.scale(pygame.image.load('date/settings_screen.png'),
 now_screen = menu
 all_sprites = pygame.sprite.Group()
 cars = pygame.sprite.Group()
+xs = []
 
 
 class Car(pygame.sprite.Sprite):
@@ -53,15 +54,19 @@ class WCar(Car):
         self.image = pygame.image.load('date/d_car1.png')
         self.s = random.randint(40, 50)
         self.rect.x = random.randint(280, 1600)
-        self.rect.y = random.randint(-500, 100)
+        self.rect.y = random.randint(-7000, -2000)
         while len(pygame.sprite.spritecollide(self, cars, dokill=0)) > 1:
             self.rect.x = random.randint(280, 1600)
-            self.rect.y = random.randint(-500, 100)
+            self.rect.y = random.randint(-7000, -2000)
+        xs.append(self.rect.x)
 
     def update(self, *args, **kwargs):
         self.rect.y += self.s
+        if len(pygame.sprite.spritecollide(self, cars, dokill=0)) > 1:
+            self.kill()
+            dcars.append(WCar())
         if self.rect.y >= 1080:
-            self.rect.y = -200
+            self.rect.y = -1000
             self.rect.x = random.randint(280, 1600)
 
 
@@ -84,23 +89,25 @@ class Field(pygame.sprite.Sprite):
             self.rect.y = -1080
 
 
-field = Field(1)
-field2 = Field(0)
-car = MainCar()
-dcars = [WCar() for i in range(4)]
 p = 0
+p2 = 0
 running = True
 while running:
     if now_screen == game and p == 0:
         field = Field(1)
         field2 = Field(0)
         car = MainCar()
+        dcars = [WCar() for i in range(5)]
         p = 1
-    if now_screen == menu:
+        p2 = 1
+    if now_screen == menu and p2 == 1:
         field.kill()
         field2.kill()
         car.kill()
-    clock.tick(600)
+        dcars = list(map(lambda x: x.kill(), dcars))
+        p2 = 0
+        p = 0
+    clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
