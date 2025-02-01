@@ -3,7 +3,6 @@ import random
 import sys
 
 FPS = 60
-
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -14,7 +13,7 @@ W, H = 1920, 1080
 
 pygame.init()
 pygame.mixer.init()
-screen = pygame.display.set_mode((0, 0), 1, vsync=1)
+screen = pygame.display.set_mode((0, 0), 1)
 pygame.display.set_caption("NeonNitro")
 clock = pygame.time.Clock()
 menu = pygame.transform.scale(pygame.image.load('date/menu_screen.png'), (W, H))
@@ -23,7 +22,6 @@ settings = pygame.transform.scale(pygame.image.load('date/settings_screen.png'),
 now_screen = menu
 all_sprites = pygame.sprite.Group()
 cars = pygame.sprite.Group()
-dt = clock.tick(FPS) / 1000.0
 
 
 class Car(pygame.sprite.Sprite):
@@ -32,14 +30,14 @@ class Car(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(pygame.image.load('date/main_car.png'), (133, 245))
         self.rect = self.image.get_rect()
         self.rect.x = 500
-        self.rect.y = 700
+        self.rect.y = 740
 
 
 class MainCar(Car):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load('date/main_car.png')
-        self.s = 10
+        self.s = 25
 
     def update(self, *args, **kwargs):
         g = pygame.key.get_pressed()
@@ -49,8 +47,23 @@ class MainCar(Car):
             self.rect.x -= self.s
 
 
+class WCar(Car):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load('date/d_car1.png')
+        self.s = random.randint(20, 50)
+        self.rect.x = random.randint(400, 1000)
+        self.rect.y = 0
+
+    def update(self, *args, **kwargs):
+        self.rect.y += self.s
+        if self.rect.y >= 1080:
+            self.rect.y = -200
+            self.rect.x = random.randint(400, 1000)
+
+
 class Field(pygame.sprite.Sprite):
-    image = pygame.transform.scale(pygame.image.load('date/field.png'), (W, H))
+    image = pygame.transform.scale(pygame.image.load('date/road.png'), (W, H))
 
     def __init__(self, p):
         super().__init__(all_sprites)
@@ -71,8 +84,10 @@ class Field(pygame.sprite.Sprite):
 field = Field(1)
 field2 = Field(0)
 car = MainCar()
+dcar = WCar()
 running = True
 while running:
+    clock.tick(600)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -94,12 +109,10 @@ while running:
     screen.fill((0, 0, 0))
     game.fill((0, 0, 0))
     all_sprites.update()
-    cars.update()
-    dt = clock.tick(FPS) / 1000.0
     all_sprites.draw(game)
+    cars.update()
     cars.draw(game)
     screen.blit(now_screen, (0, 0))
-    clock.tick(FPS)
     pygame.display.flip()
 
 pygame.quit()
