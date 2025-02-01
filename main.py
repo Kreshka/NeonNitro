@@ -51,15 +51,18 @@ class WCar(Car):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load('date/d_car1.png')
-        self.s = random.randint(20, 50)
-        self.rect.x = random.randint(400, 1000)
-        self.rect.y = 0
+        self.s = random.randint(40, 50)
+        self.rect.x = random.randint(280, 1600)
+        self.rect.y = random.randint(-500, 100)
+        while len(pygame.sprite.spritecollide(self, cars, dokill=0)) > 1:
+            self.rect.x = random.randint(280, 1600)
+            self.rect.y = random.randint(-500, 100)
 
     def update(self, *args, **kwargs):
         self.rect.y += self.s
         if self.rect.y >= 1080:
             self.rect.y = -200
-            self.rect.x = random.randint(400, 1000)
+            self.rect.x = random.randint(280, 1600)
 
 
 class Field(pygame.sprite.Sprite):
@@ -84,9 +87,19 @@ class Field(pygame.sprite.Sprite):
 field = Field(1)
 field2 = Field(0)
 car = MainCar()
-dcar = WCar()
+dcars = [WCar() for i in range(4)]
+p = 0
 running = True
 while running:
+    if now_screen == game and p == 0:
+        field = Field(1)
+        field2 = Field(0)
+        car = MainCar()
+        p = 1
+    if now_screen == menu:
+        field.kill()
+        field2.kill()
+        car.kill()
     clock.tick(600)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
