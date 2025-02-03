@@ -19,7 +19,8 @@ clock = pygame.time.Clock()
 menu_img = pygame.transform.scale(pygame.image.load('data/menu_screen.png'), (W, H))
 menu = pygame.Surface((W, H))
 game = pygame.Surface((W, H))
-settings = pygame.transform.scale(pygame.image.load('data/settings_screen.png'), (W, H))
+settings = pygame.Surface((W, H))
+settings_image = pygame.transform.scale(pygame.image.load('data/settings_screen.png'), (W, H))
 choose_mode_screen = pygame.transform.scale(pygame.image.load('data/dif_choose_mode.png'), (W, H))
 game_over = pygame.transform.scale(pygame.image.load('data/game_over_screen.png'), (W, H))
 n1, n2, n3, go = (
@@ -37,8 +38,9 @@ menu_sprites = pygame.sprite.Group()
 coinss = pygame.sprite.Group()
 xs = []
 f1 = pygame.font.Font("data/font.ttf", 80)
-list_of_skins = [("data/main_car.png", True, 0), ("data/skin1.png", False, 400), ("data/skin2.png", False, 100)]
-now_skin = 1
+with open("data/skins.dat", "r") as f:
+    list_of_skins = list(map(lambda x: [x.split()[0], int(x.split()[1]), int(x.split()[2])], f.read().split("\n")))
+now_skin = 0
 
 
 class Car(pygame.sprite.Sprite):
@@ -306,7 +308,7 @@ def game_loop(casc):
 
 
 def skins_menu():
-    global sets_running
+    global sets_running, coins, now_skin
     sets_running = True
     now_skin_view = 0
     while sets_running:
@@ -314,6 +316,14 @@ def skins_menu():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     sets_running = False
+                if event.key == pygame.K_a:
+                    now_skin_view -= 1
+                    if now_skin_view == -1:
+                        now_skin_view = len(list_of_skins) - 1
+                if event.key == pygame.K_d:
+                    now_skin_view += 1
+                    if now_skin_view == len(list_of_skins):
+                        now_skin_view = 0
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if 660 < event.pos[0] < 760 and 540 < event.pos[1] < 648 and event.button == 1:
                     now_skin_view += 1
@@ -323,11 +333,28 @@ def skins_menu():
                     now_skin_view -= 1
                     if now_skin_view == -1:
                         now_skin_view = len(list_of_skins) - 1
+                if 960 - 200 // 2 <= event.pos[0] <= 960 - 200 // 2 + 200 and 1080 / 2 + 300 <= event.pos[
+                    1] <= 1080 / 2 + 300 + 50 and event.button == 1:
+                    if not list_of_skins[now_skin_view][1] and coins.coins >= list_of_skins[now_skin_view][2]:
+                        coins.coins -= list_of_skins[now_skin_view][2]
+                        list_of_skins[now_skin_view][1] = True
+                    if now_skin_view != now_skin:
+                        now_skin = now_skin_view
 
         screen.fill((0, 0, 0))
+        settings.fill((0, 0, 0))
+        settings.blit(settings_image, (0, 0))
         settings.blit(pygame.image.load("data/right.png"), (660, 540))
         settings.blit(pygame.transform.rotate(pygame.image.load("data/right.png"), 180), (1160, 540))
-        settings.blit(pygame.transform.scale(pygame.image.load(list_of_skins[now_skin_view][0]), (157, 287)), (931, 480))
+        settings.blit(pygame.transform.scale(pygame.image.load(list_of_skins[now_skin_view][0]), (189, 369)),
+                      (960 - 189 / 2, 1080 / 2 - 369 / 4))
+        settings.blit(pygame.transform.scale(
+            pygame.image.load("data/buy_button.png" if not list_of_skins[now_skin_view][
+                1] else "data/use_button.png" if now_skin_view != now_skin else "data/used_button.png"),
+            (200, 100)), (960 - 200 // 2, 1080 / 2 + 300))
+        settings.blit((a := f1.render(
+            str(list_of_skins[now_skin_view][2]) if list_of_skins[now_skin_view][2] else "free", True,
+            (255, 255, 255))), (960 - a.get_rect().w // 2, 1080 / 2 - 300))
         screen.blit(settings, (0, 0))
         pygame.display.flip()
 
@@ -390,4 +417,6 @@ while running:
     pygame.display.flip()
     with open("data/coins.dat", "w") as f:
         f.write(str(coins.coins))
+    with open("data/skins.dat", "w") as f:
+        f.write("\n".join(list(map(lambda x: " ".join([x[0], str(x[1]), str(x[2])]), list_of_skins))))
 pygame.quit()
