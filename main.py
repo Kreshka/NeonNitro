@@ -37,6 +37,8 @@ menu_sprites = pygame.sprite.Group()
 coinss = pygame.sprite.Group()
 xs = []
 f1 = pygame.font.Font("data/font.ttf", 80)
+list_of_skins = [("data/main_car.png", True, 0), ("data/skin1.png", False, 400), ("data/skin2.png", False, 100)]
+now_skin = 1
 
 
 class Car(pygame.sprite.Sprite):
@@ -51,7 +53,7 @@ class Car(pygame.sprite.Sprite):
 class MainCar(Car):
     def __init__(self):
         super().__init__(all_sprites)
-        self.image = pygame.image.load('data/main_car.png')
+        self.image = pygame.image.load(list_of_skins[now_skin][0])
         self.s = 25
         self.ts = 300
         self.f = 0
@@ -222,7 +224,7 @@ class WCoins(pygame.sprite.Sprite):
                 self.rect.x = random.randint(280, 1600)
                 coins.coins += 10
             if self.rect.y >= 1080:
-                self.rect.y =  random.randint(-1200, -200)
+                self.rect.y = random.randint(-1200, -200)
                 self.rect.x = random.randint(280, 1600)
         else:
             pass
@@ -306,13 +308,26 @@ def game_loop(casc):
 def skins_menu():
     global sets_running
     sets_running = True
+    now_skin_view = 0
     while sets_running:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     sets_running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if 660 < event.pos[0] < 760 and 540 < event.pos[1] < 648 and event.button == 1:
+                    now_skin_view += 1
+                    if now_skin_view == len(list_of_skins):
+                        now_skin_view = 0
+                if 1160 <= event.pos[0] <= 1260 and 540 <= event.pos[1] <= 648 and event.button == 1:
+                    now_skin_view -= 1
+                    if now_skin_view == -1:
+                        now_skin_view = len(list_of_skins) - 1
 
         screen.fill((0, 0, 0))
+        settings.blit(pygame.image.load("data/right.png"), (660, 540))
+        settings.blit(pygame.transform.rotate(pygame.image.load("data/right.png"), 180), (1160, 540))
+        settings.blit(pygame.transform.scale(pygame.image.load(list_of_skins[now_skin_view][0]), (157, 287)), (931, 480))
         screen.blit(settings, (0, 0))
         pygame.display.flip()
 
