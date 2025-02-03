@@ -418,5 +418,5 @@ while running:
     with open("data/coins.dat", "w") as f:
         f.write(str(coins.coins))
     with open("data/skins.dat", "w") as f:
-        f.write("\n".join(list(map(lambda x: " ".join([x[0], str(x[1]), str(x[2])]), list_of_skins))))
+        f.write("\n".join(list(map(lambda x: " ".join([x[0], str(int(x[1])), str(x[2])]), list_of_skins))))
 pygame.quit()
